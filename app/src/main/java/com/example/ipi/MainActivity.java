@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ipi.R;
 import java.lang.Math;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     static {
@@ -128,43 +129,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         clr_flag=true;
         double myPi = 0;
         int ACCURACY = Integer.parseInt(exp); // 考虑精度，位数增加k，结果减少k位
-//        if (formula_type == 0) { // Leibniz
-//            computing_time = "Leibniz: ";
-//            int pn_value = 1;
-//            for (int i = 0; i < ACCURACY; i++) {
-//                myPi += pn_value * (1 / (1.0 * 2 * i + 1));
-//                pn_value *= -1;
-//            }
-//            myPi = 4 * myPi;
-//        } else if (formula_type == 1) { // Ramanujan
-//            computing_time = "Ramanujan: ";
-//            for (int i = 0; i < ACCURACY; i++) {
-//                myPi += calculateFactorial(4 * i) * (26390 * i + 1103) / (Math.pow(calculateFactorial(i), 4) * Math.pow(396, 4 * i));
-//            }
-//            myPi = 99 * 99 / (2 * Math.sqrt(2) * myPi);
-//        } else if (formula_type == 2) { // Chudnovsky
-//            computing_time = "Chudnovsky: ";
-//            int pn_value = 1;
-//            for (int i = 0; i < ACCURACY; i++) {
-//                myPi += pn_value * calculateFactorial(6 * i) * (13591409 + 545140134 * i) / (Math.pow(calculateFactorial(i), 3) * calculateFactorial(3 * i) * Math.pow(640320, 3 * i));
-//                pn_value *= -1;
-//            }
-//            myPi = 53360 * Math.sqrt(640320) / myPi;
-//        } else if (formula_type == 3) { // Wallis
-//            computing_time = "Wallis: ";
-//            myPi = 1;
-//            int numerator = 2;
-//            int denominator = 1;
-//            for (int i = 0; i < ACCURACY; i++) {
-//                myPi *= numerator / (1.0 * denominator);
-//                int j = numerator;
-//                numerator = denominator + 1;
-//                denominator = j + 1;
-//            }
-//            myPi *= 2;
-//        } else {
-//            myPi = getPi(formula_type, ACCURACY);
-//        }
         if (formula_type == 0) { // Leibniz
             computing_time = "Leibniz: ";
         } else if (formula_type == 1) { // Ramanujan
@@ -174,12 +138,53 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (formula_type == 3) { // Wallis
             computing_time = "Wallis: ";
         }
-        myPi = getPi(formula_type, ACCURACY);
+        Random numList = new Random(); // 随机选择使用哪种语言计算
+        int languageType = numList.nextInt(2);
+        if (languageType == 0)
+            myPi = javaGetPi(formula_type, ACCURACY);
+        else
+            myPi = getPi(formula_type, ACCURACY);
         et_input.setText(myPi + "");
+
         long endtime = System.nanoTime();
         et_computing_time.setText(computing_time + (endtime - starttime) + " (ns)" + "  " + "Iterations: " + ACCURACY + " (times)");
     }
     public  native double getPi(int formula_type, int accuracy);
+    public double javaGetPi(int formula_type, int ACCURACY) {
+        double myPi = 0;
+        if (formula_type == 0) { // Leibniz
+            int pn_value = 1;
+            for (int i = 0; i < ACCURACY; i++) {
+                myPi += pn_value * (1 / (1.0 * 2 * i + 1));
+                pn_value *= -1;
+            }
+            myPi = 4 * myPi;
+        } else if (formula_type == 1) { // Ramanujan
+            for (int i = 0; i < ACCURACY; i++) {
+                myPi += calculateFactorial(4 * i) * (26390 * i + 1103) / (Math.pow(calculateFactorial(i), 4) * Math.pow(396, 4 * i));
+            }
+            myPi = 99 * 99 / (2 * Math.sqrt(2) * myPi);
+        } else if (formula_type == 2) { // Chudnovsky
+            int pn_value = 1;
+            for (int i = 0; i < ACCURACY; i++) {
+                myPi += pn_value * calculateFactorial(6 * i) * (13591409 + 545140134 * i) / (Math.pow(calculateFactorial(i), 3) * calculateFactorial(3 * i) * Math.pow(640320, 3 * i));
+                pn_value *= -1;
+            }
+            myPi = 53360 * Math.sqrt(640320) / myPi;
+        } else if (formula_type == 3) { // Wallis
+            myPi = 1;
+            int numerator = 2;
+            int denominator = 1;
+            for (int i = 0; i < ACCURACY; i++) {
+                myPi *= numerator / (1.0 * denominator);
+                int j = numerator;
+                numerator = denominator + 1;
+                denominator = j + 1;
+            }
+            myPi *= 2;
+        }
+        return myPi;
+    }
     public static long calculateFactorial(int n) {
         long factorial = 1;
         for (int i = 1; i <= n; i++)
